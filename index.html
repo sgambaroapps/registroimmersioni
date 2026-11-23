@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nautilus - Registro Immersioni — il registro delle immersioni per diving e associazioni</title>
+<meta name="description" content="Il registro delle immersioni per diving center e associazioni subacquee, come chiede la legge 70/2026: immersioni, partecipanti e libretti con QR firmato. Gratuito, per Windows, i dati restano sul tuo computer.">
+<link rel="icon" href="assets/icona.png">
+<link rel="apple-touch-icon" href="assets/icona.png">
+<meta name="theme-color" content="#0b3c5d">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Nautilus - Registro Immersioni">
+<meta property="og:description" content="Il registro delle immersioni per diving center e associazioni subacquee, come chiede la legge 70/2026: immersioni, partecipanti e libretti con QR firmato. Gratuito, per Windows, i dati restano sul tuo computer.">
+<meta property="og:image" content="https://sgambaroapps.github.io/registroimmersioni/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{
+  --fondo:#ffffff; --testo:#14212b; --tenue:#5a6a76;
+  --blu:#0b3c5d; --azzurro:#1b7aa6; --chiaro:#eef6fb; --bordo:#dbe6ee;
+  --scheda:#ffffff; --ombra:0 1px 2px rgba(11,60,93,.06), 0 8px 24px rgba(11,60,93,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --fondo:#0f171e; --testo:#e7eef3; --tenue:#9db0be;
+    --blu:#8fc7e0; --azzurro:#5fb0d4; --chiaro:#16242e; --bordo:#263a48;
+    --scheda:#141f28; --ombra:0 1px 2px rgba(0,0,0,.3), 0 10px 26px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+/* L'attributo hidden deve vincere sulle regole che danno un display agli
+   elementi (per esempio .brand span): senza questo le sei diciture di lingua
+   resterebbero tutte visibili una sotto l'altra. */
+[hidden]{display:none !important}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--fondo); color:var(--testo);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+img{max-width:100%; display:block}
+a{color:var(--azzurro)}
+
+/* ---- barra in alto ---- */
+.top{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  max-width:1060px; margin:0 auto; padding:14px 20px;
+}
+.brand{display:flex; align-items:center; gap:11px; min-width:0}
+.brand img{width:40px; height:40px; border-radius:10px; flex:none}
+.brand b{display:block; font-size:1.02rem; letter-spacing:.2px; line-height:1.2}
+.brand span{display:block; font-size:.8rem; color:var(--tenue)}
+nav#lingue{display:flex; flex-wrap:wrap; gap:6px}
+nav#lingue a{
+  font-size:.82rem; text-decoration:none; padding:5px 12px; border-radius:999px;
+  border:1px solid var(--bordo); color:var(--tenue);
+}
+nav#lingue a:hover{border-color:var(--azzurro); color:var(--azzurro)}
+nav#lingue a.attiva{background:var(--azzurro); border-color:var(--azzurro); color:#fff; font-weight:600}
+
+/* ---- apertura ---- */
+.hero{
+  position:relative; overflow:hidden; color:#fff; border-radius:22px;
+  background:linear-gradient(135deg,#0a2a47 0%,#12507d 52%,#2b86ad 100%);
+  padding:52px 30px 46px; text-align:center;
+}
+.hero::after{
+  content:""; position:absolute; inset:-40% -10% auto; height:130%;
+  background:radial-gradient(60% 55% at 50% 0%, rgba(255,255,255,.22), transparent 70%);
+  pointer-events:none;
+}
+.hero>*{position:relative; z-index:1}
+.hero h1{margin:0 auto 14px; font-size:2.25rem; line-height:1.18; max-width:16em; letter-spacing:-.4px}
+.hero p.sub{margin:0 auto; max-width:40em; font-size:1.08rem; color:#dcecf6}
+.chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:22px auto 0; max-width:44em}
+.chips span{
+  font-size:.83rem; padding:6px 13px; border-radius:999px;
+  background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.26); color:#fff;
+}
+
+/* ---- pulsanti store ---- */
+.store{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:26px 0 0}
+.store a, .store span.presto{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:56px; padding:0; text-decoration:none;
+}
+.store a img{height:56px; width:auto}
+.store .ripiego{
+  display:none; align-items:center; gap:9px; height:54px; padding:0 20px; border-radius:11px;
+  background:#fff; color:#0a2a47; font-weight:600; font-size:.95rem; border:1px solid rgba(255,255,255,.5);
+}
+.store a.senzabadge img{display:none}
+.store a.senzabadge .ripiego{display:inline-flex}
+.store span.presto{
+  padding:0 20px; height:54px; border-radius:11px; font-size:.92rem;
+  background:rgba(255,255,255,.12); border:1px dashed rgba(255,255,255,.5); color:#eaf4fa;
+}
+.nota{margin:14px 0 0; font-size:.9rem; font-weight:700; color:#e9f5fc}
+
+/* ---- corpo ---- */
+.wrap{max-width:1060px; margin:0 auto; padding:0 20px 10px}
+section.pagina{padding-bottom:40px}
+h2{font-size:1.55rem; margin:54px 0 6px; letter-spacing:-.3px; color:var(--testo)}
+h2+p.occhiello{margin:0 0 22px; color:var(--tenue); max-width:46em}
+
+.griglia{display:grid; gap:14px;
+  /* min(...) e' indispensabile: senza, su uno schermo stretto la colonna
+     resterebbe larga 228px e la pagina sborderebbe di lato. */
+  grid-template-columns:repeat(auto-fit,minmax(min(228px,100%),1fr));
+}
+.card{
+  background:var(--scheda); border:1px solid var(--bordo); border-radius:16px;
+  padding:18px 18px 19px; box-shadow:var(--ombra);
+  transition:transform .16s ease, box-shadow .16s ease;
+}
+.card:hover{transform:translateY(-2px); box-shadow:0 2px 4px rgba(11,60,93,.08), 0 14px 30px rgba(11,60,93,.12)}
+.card .ico{
+  width:42px; height:42px; border-radius:12px; background:var(--chiaro);
+  display:flex; align-items:center; justify-content:center; margin-bottom:12px; color:var(--azzurro);
+}
+.card h3{margin:0 0 5px; font-size:1.02rem}
+.card p{margin:0; font-size:.9rem; color:var(--tenue); line-height:1.55}
+
+/* ---- perche' e' diversa ---- */
+.perche{
+  margin-top:54px; background:var(--chiaro); border:1px solid var(--bordo);
+  border-radius:20px; padding:30px 26px;
+}
+.perche h2{margin:0 0 16px}
+.perche ul{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr)); gap:11px 26px}
+.perche li{position:relative; padding-left:29px; font-size:.95rem}
+.perche li::before{
+  content:""; position:absolute; left:0; top:.34em; width:18px; height:18px; border-radius:50%;
+  background:var(--azzurro);
+  -webkit-mask:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M9.6 16.2 5.4 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4z'/%3E%3C/svg%3E") center/115% no-repeat;
+  mask:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M9.6 16.2 5.4 12l-1.4 1.4 5.6 5.6 12-12-1.4-1.4z'/%3E%3C/svg%3E") center/115% no-repeat;
+}
+
+/* ---- striscia delle schermate ---- */
+.striscia{display:flex; gap:16px; overflow-x:auto; padding:6px 2px 18px; scroll-snap-type:x mandatory}
+.striscia img{
+  width:min(540px,84vw); flex:none; border-radius:16px; border:1px solid var(--bordo);
+  box-shadow:var(--ombra); scroll-snap-align:center;
+  /* height:auto e' obbligatorio: nel tag c'e' anche l'attributo height (serve a
+     tenere lo spazio mentre l'immagine arriva), e senza questa riga il browser
+     lo prenderebbe alla lettera insieme alla larghezza del CSS, schiacciando le
+     schermate in verticale. */
+  height:auto;
+}
+
+/* ---- chiusura ---- */
+.chiusura{
+  margin-top:54px; border-radius:22px; text-align:center; color:#fff; padding:40px 26px 42px;
+  background:linear-gradient(135deg,#0a2a47 0%,#12507d 52%,#2b86ad 100%);
+}
+.chiusura h2{color:#fff; margin:0 0 6px}
+footer{margin:34px 0 46px; padding-top:20px; border-top:1px solid var(--bordo); color:var(--tenue); font-size:.87rem}
+footer .link{display:flex; flex-wrap:wrap; gap:8px 18px; margin-bottom:14px}
+footer p{margin:0 0 9px; max-width:60em}
+footer .disc{font-size:.8rem; opacity:.9}
+
+@media (max-width:720px){
+  .hero{border-radius:18px; padding:40px 20px 38px}
+  .hero h1{font-size:1.72rem}
+  .hero p.sub{font-size:1rem}
+  h2{font-size:1.32rem; margin-top:44px}
+}
+/* Senza JavaScript restano visibili tutte e due le lingue, una sotto l'altra. */
+body.js section.pagina[hidden]{display:none}
+section.pagina + section.pagina{border-top:1px dashed var(--bordo); margin-top:30px}
+body.js section.pagina + section.pagina{border-top:none; margin-top:0}
+/* ---- rimando al programma gemello per i diving ---- */
+.gemella{
+  margin-top:54px; display:flex; gap:20px; align-items:center;
+  background:var(--scheda); border:1.5px solid var(--azzurro); border-radius:20px; padding:22px 24px; box-shadow:var(--ombra);
+}
+.gemella img{width:72px; height:72px; border-radius:16px; flex:none}
+.gemella h2{margin:0 0 6px; font-size:1.3rem}
+.gemella p{margin:0 0 10px; color:var(--tenue); font-size:.95rem}
+.gemella .link{display:flex; flex-wrap:wrap; gap:6px 18px; font-size:.92rem; font-weight:600}
+@media (max-width:720px){
+  .gemella{flex-direction:column; align-items:flex-start; padding:20px}
+  .gemella img{width:60px; height:60px}
+}
+/* ---- frecce ai lati delle schermate (le crea lo script; senza JS resta la barra) ---- */
+.carosello{position:relative}
+/* top: il -9px compensa il padding-bottom di 18px della .striscia */
+.freccia{position:absolute; top:calc(50% - 9px); transform:translateY(-50%); z-index:2; width:46px; height:46px; border-radius:50%; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; background:var(--scheda); color:var(--azzurro); border:1px solid var(--bordo); box-shadow:var(--ombra); transition:opacity .16s ease, background .16s ease}
+.freccia:hover{background:var(--chiaro)}
+.freccia:focus-visible{outline:2px solid var(--azzurro); outline-offset:2px}
+.freccia.prima{left:8px} .freccia.dopo{right:8px}
+.freccia:disabled{opacity:0; pointer-events:none}
+@media (max-width:720px){ .freccia{width:40px; height:40px} .freccia.prima{left:4px} .freccia.dopo{right:4px} }
+/* schermate a tutto schermo: si aprono toccandone una */
+.striscia img{cursor:zoom-in}
+.schermo{position:fixed; inset:0; z-index:50; background:#060d14; color:#fff}
+.schermo-striscia{
+  display:flex; width:100%; height:100%; overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior:contain;
+}
+.schermo-striscia::-webkit-scrollbar{display:none}
+.schermo-striscia>div{
+  flex:0 0 100%; height:100%; display:flex; align-items:center; justify-content:center;
+  padding:60px 76px; scroll-snap-align:center;
+}
+.schermo-striscia img{max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; border-radius:10px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.schermo .freccia{position:fixed; top:50%; background:rgba(255,255,255,.14); color:#fff; border-color:rgba(255,255,255,.3); box-shadow:none}
+.schermo .freccia:hover{background:rgba(255,255,255,.26)}
+.schermo .freccia.prima{left:14px}
+.schermo .freccia.dopo{right:14px}
+.schermo .chiudi{
+  position:fixed; top:12px; right:12px; width:46px; height:46px; border-radius:50%; padding:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3);
+}
+.schermo .chiudi:hover{background:rgba(255,255,255,.26)}
+.schermo .chiudi:focus-visible{outline:2px solid #fff; outline-offset:2px}
+.schermo .conta{position:fixed; top:22px; left:0; right:0; text-align:center; font-size:.9rem; color:#cfe0ea; pointer-events:none}
+/* telefono in orizzontale: poco spazio in altezza, l'immagine ne prende il più possibile */
+@media (max-height:500px){
+  .schermo-striscia>div{padding:46px 70px 10px}
+  .schermo .conta{top:14px}
+}
+@media (max-width:720px){
+  .schermo-striscia>div{padding:64px 6px}
+  .schermo .freccia{top:auto; bottom:18px; transform:none}
+  .schermo .freccia.prima{left:calc(50% - 56px)}
+  .schermo .freccia.dopo{right:calc(50% - 56px)}
+}
+/* ---- solo di questa pagina ---- */
+.store a.ms img{height:56px}
+/* «Formato aperto LDI»: giallo e cliccabile, porta al repository della specifica (Fabio, 23/11/2026) */
+a.chip-ldi{
+  font-size:.83rem; padding:6px 13px; border-radius:999px; text-decoration:none; font-weight:600;
+  background:#ffd54a; border:1px solid #ffd54a; color:#2b2200; transition:background .16s ease;
+}
+a.chip-ldi:hover{background:#ffe484; border-color:#ffe484}
+a.chip-ldi:focus-visible{outline:2px solid var(--azzurro); outline-offset:2px}
+.divekit{
+  margin-top:28px; display:flex; gap:20px; align-items:center;
+  background:var(--scheda); border:1.5px solid var(--azzurro); border-radius:20px; padding:22px 24px; box-shadow:var(--ombra);
+}
+.divekit img{width:72px; height:72px; border-radius:16px; flex:none}
+.divekit h2{margin:0 0 6px; font-size:1.3rem}
+.divekit p{margin:0 0 10px; color:var(--tenue); font-size:.95rem}.divekit .link{display:flex; flex-wrap:wrap; gap:6px 18px; font-size:.92rem; font-weight:600}
+/* frecce delle schermate: le aggiunge lo script, quindi senza JavaScript resta solo la barra di scorrimento */
+.carosello{position:relative}
+.freccia{
+  position:absolute; top:calc(50% - 9px); transform:translateY(-50%); z-index:2;
+  width:46px; height:46px; border-radius:50%; padding:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--scheda); color:var(--azzurro); border:1px solid var(--bordo); box-shadow:var(--ombra);
+  transition:opacity .16s ease, background .16s ease;
+}
+.freccia:hover{background:var(--chiaro)}
+.freccia:focus-visible{outline:2px solid var(--azzurro); outline-offset:2px}
+.freccia.prima{left:8px}
+.freccia.dopo{right:8px}
+.freccia:disabled{opacity:0; pointer-events:none}
+/* schermate a tutto schermo: si aprono toccandone una */
+.striscia img{cursor:zoom-in}
+.schermo{position:fixed; inset:0; z-index:50; background:#060d14; color:#fff}
+.schermo-striscia{
+  display:flex; width:100%; height:100%; overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior:contain;
+}
+.schermo-striscia::-webkit-scrollbar{display:none}
+.schermo-striscia>div{
+  flex:0 0 100%; height:100%; display:flex; align-items:center; justify-content:center;
+  padding:60px 76px; scroll-snap-align:center;
+}
+.schermo-striscia img{max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; border-radius:10px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.schermo .freccia{position:fixed; top:50%; background:rgba(255,255,255,.14); color:#fff; border-color:rgba(255,255,255,.3); box-shadow:none}
+.schermo .freccia:hover{background:rgba(255,255,255,.26)}
+.schermo .freccia.prima{left:14px}
+.schermo .freccia.dopo{right:14px}
+.schermo .chiudi{
+  position:fixed; top:12px; right:12px; width:46px; height:46px; border-radius:50%; padding:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3);
+}
+.schermo .chiudi:hover{background:rgba(255,255,255,.26)}
+.schermo .chiudi:focus-visible{outline:2px solid #fff; outline-offset:2px}
+.schermo .conta{position:fixed; top:22px; left:0; right:0; text-align:center; font-size:.9rem; color:#cfe0ea; pointer-events:none}
+.schermo .gira{display:none; position:fixed; left:16px; right:16px; bottom:80px; text-align:center; font-size:.85rem; color:#9fb6c4; pointer-events:none}
+/* telefono in verticale: suggerisce di girarlo, le schermate di Windows sono orizzontali */
+@media (max-width:720px) and (orientation:portrait){ .schermo .gira{display:block} }
+/* telefono in orizzontale: poco spazio in altezza, l'immagine ne prende il più possibile */
+@media (max-height:500px){
+  .schermo-striscia>div{padding:46px 70px 10px}
+  .schermo .conta{top:14px}
+}
+@media (max-width:720px){
+  .schermo-striscia>div{padding:64px 6px}
+  .schermo .freccia{top:auto; bottom:18px; transform:none}
+  .schermo .freccia.prima{left:calc(50% - 56px)}
+  .schermo .freccia.dopo{right:calc(50% - 56px)}
+  .freccia{width:40px; height:40px}
+  .freccia.prima{left:4px}
+  .freccia.dopo{right:4px}
+  .divekit{flex-direction:column; align-items:flex-start; padding:20px}
+  .divekit img{width:60px; height:60px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><img src="assets/icona.png" alt="" width="40" height="40"><div><b>Nautilus - Registro Immersioni</b><span data-claim="it">Il registro delle immersioni per diving e associazioni</span><span data-claim="en" hidden>The dive register for dive centres and clubs</span></div></div>
+<nav id="lingue"><a href="#it" data-lang="it">Italiano</a><a href="#en" data-lang="en">English</a></nav></header>
+<main>
+<section class="pagina" id="it" lang="it" data-titolo="Nautilus - Registro Immersioni — il registro delle immersioni per diving e associazioni">
+<div class="wrap">
+<div class="hero">
+<h1>Il registro delle immersioni, semplice e gratuito</h1>
+<p class="sub">Per diving center e associazioni subacquee: immersioni, partecipanti e libretti con QR firmato, come chiede la legge 70/2026. I dati restano sul tuo computer.</p>
+<div class="chips"><span>Gratis</span><span>Niente pubblicità</span><span>Windows 10/11</span><span>Funziona offline</span><a class="chip-ldi" href="https://github.com/sgambaroapps/ldi">Formato aperto LDI</a></div>
+<div class="store"><a href="https://apps.microsoft.com/detail/9PCM9BBVLB2Z?hl=it-IT&amp;gl=IT" class="ms"><img src="assets/badge/microsoft-it.svg" alt="Scarica da Microsoft" onerror="this.parentElement.classList.add('senzabadge')"><span class="ripiego">Microsoft Store</span></a></div>
+<p class="nota">Gratis per Windows. Nessun acquisto, nessun abbonamento.</p>
+</div>
+<h2>Cosa c'è dentro</h2>
+<p class="occhiello">Tutto quello che serve per il registro e i libretti, già pronto: si installa dallo Store e si comincia.</p>
+<div class="griglia">
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h11v18H6a2 2 0 0 1-2-2z"/><path d="M17 3h2a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-2"/><path d="M8 8h6M8 12h6M8 16h3"/></svg></div><h3>Registro delle immersioni</h3><p>Prima di partire data, ora, sito, guide e partecipanti con il brevetto; al rientro ora di fine, profondità, autorespiratore e miscela, come chiede l'art. 12.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.4 6-5.4s6 2.1 6 5.4"/><path d="M16 5.2A3.2 3.2 0 0 1 16 11m1.6 3.9c2 .7 3.4 2.5 3.4 5.1"/></svg></div><h3>Clienti, soci, istruttori e guide</h3><p>Una scheda per persona: contatti, contatto di emergenza, brevetti e certificati medici con lo storico, documenti e foto allegati.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 20h18.4z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6" fill="currentColor" stroke="none"/></svg></div><h3>Avvisi</h3><p>Il programma ti avverte se a un partecipante manca il brevetto o se il suo certificato medico è scaduto.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="14" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="3.5" y="14" width="6.5" height="6.5" rx="1"/><path d="M14 14h2.5v2.5H14zM18 18h2.5v2.5H18zM14 19h1.5M19.5 14v2"/></svg></div><h3>Libretti con QR firmato</h3><p>Ogni partecipante riceve il suo libretto, in italiano e nella sua lingua (6 lingue), con il QR firmato dal sigillo digitale del diving.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg></div><h3>Stampe</h3><p>Registro di legge, riepiloghi delle immersioni, libretti di annullamento e modulo di iscrizione: in anteprima, da stampare o salvare in PDF e PNG.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg></div><h3>Archivio cifrato e backup</h3><p>L'archivio è cifrato sul computer. Backup chiusi con una password e copia automatica in un'altra cartella.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Più persone, un solo archivio</h3><p>Tutti gli account di Windows del computer usano lo stesso archivio, uno alla volta.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6v.4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg></div><h3>Manuale e «?»</h3><p>Un «?» accanto a ogni voce spiega a cosa serve e perché conviene; il Manuale completo si apre con F1.</p></div>
+</div>
+<div class="divekit"><img src="assets/divekit.png" alt="" width="72" height="72"><div><h2>Compatibile con Nautilus DiveKit</h2><p>Il sub inquadra il QR del libretto con l'app gratuita <b>Nautilus DiveKit</b> (Android e iPhone) e l'immersione entra nel suo logbook, con i dati firmati dal diving. Chiunque può verificare il QR con la pagina web gratuita: il formato LDI è aperto e documentato.</p><p>Con DiveKit il sub può anche mandarti, in un solo PDF, i suoi brevetti, il certificato medico, l'assicurazione e, se vuole, i suoi dati personali: lo alleghi alla sua scheda nel Registro, così hai tutto a portata di mano.</p><div class="link"><a href="https://sgambaroapps.github.io/nautilusdivekit/#it">Scopri Nautilus DiveKit</a><a href="https://sgambaroapps.github.io/ldi/">Verifica un libretto</a><a class="chip-ldi" href="https://github.com/sgambaroapps/ldi">Il formato aperto LDI</a></div></div></div>
+<div class="perche"><h2>Perché è diverso</h2><ul><li>Gratis davvero: nessun abbonamento, nessuna funzione a pagamento</li><li>Niente pubblicità e niente account da creare</li><li>I dati restano solo sul computer del diving: il programma non manda niente a nessuno</li><li>Formato aperto: chiunque può verificare un libretto, senza programmi da installare</li><li>Firma digitale: un libretto modificato non risulta più valido</li><li>Funziona senza internet</li></ul></div>
+<h2>Come si presenta</h2>
+<div class="striscia">
+<img src="assets/shots/01-home.jpg" width="1400" height="788" loading="lazy" alt="La Home">
+<img src="assets/shots/03-immersione.jpg" width="1400" height="788" loading="lazy" alt="Un'immersione">
+<img src="assets/shots/04-partecipanti.jpg" width="1400" height="788" loading="lazy" alt="I partecipanti">
+<img src="assets/shots/06-scheda-cliente.jpg" width="1400" height="788" loading="lazy" alt="La scheda di un cliente">
+<img src="assets/shots/07-stampe.jpg" width="1400" height="788" loading="lazy" alt="Le stampe">
+</div>
+<div class="chiusura"><h2>Scarica il programma</h2><div class="store"><a href="https://apps.microsoft.com/detail/9PCM9BBVLB2Z?hl=it-IT&amp;gl=IT" class="ms"><img src="assets/badge/microsoft-it.svg" alt="Scarica da Microsoft" onerror="this.parentElement.classList.add('senzabadge')"><span class="ripiego">Microsoft Store</span></a></div><p class="nota">Gratis per Windows. Nessun acquisto, nessun abbonamento.</p></div>
+<footer><div class="link"><a href="https://sgambaroapps.github.io/nautilus-privacy/registro.html">Informativa sulla privacy</a><a href="mailto:sgambaro.apps@gmail.com">Assistenza</a><a href="https://sgambaroapps.github.io/nautilusdivekit/#it">Nautilus DiveKit</a><a href="https://sgambaroapps.github.io/ldi/">Verifica dei libretti</a></div><p>Progetto indipendente realizzato in Italia. Nessun dato del diving lascia il computer.</p><p class="disc">Il programma è fornito gratuitamente «così com'è», senza garanzie di alcun tipo. Chi lo adotta è responsabile del suo utilizzo, dei dati inseriti e del rispetto degli obblighi di legge. Nei limiti consentiti dalla legge, l'autore non risponde di danni derivanti dall'uso del programma.</p></footer>
+</div></section>
+<section class="pagina" id="en" lang="en" data-titolo="Nautilus - Registro Immersioni — the dive register for dive centres and clubs">
+<div class="wrap">
+<div class="hero">
+<h1>The dive register, simple and free</h1>
+<p class="sub">For dive centres and diving clubs in Italy: dives, participants and dive logs with a signed QR code, as required by Italian law 70/2026. Your data stays on your computer.</p>
+<div class="chips"><span>Free</span><span>No ads</span><span>Windows 10/11</span><span>Works offline</span><a class="chip-ldi" href="https://github.com/sgambaroapps/ldi">Open LDI format</a></div>
+<div class="store"><a href="https://apps.microsoft.com/detail/9PCM9BBVLB2Z?hl=en-GB&amp;gl=IT" class="ms"><img src="assets/badge/microsoft-en.svg" alt="Get it from Microsoft" onerror="this.parentElement.classList.add('senzabadge')"><span class="ripiego">Microsoft Store</span></a></div>
+<p class="nota">Free for Windows. The program is in Italian; dive logs are printed in 6 languages.</p>
+</div>
+<h2>What is inside</h2>
+<p class="occhiello">Everything you need for the register and the dive logs, ready to use: install it from the Store and start.</p>
+<div class="griglia">
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h11v18H6a2 2 0 0 1-2-2z"/><path d="M17 3h2a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-2"/><path d="M8 8h6M8 12h6M8 16h3"/></svg></div><h3>Dive register</h3><p>Before leaving: date, time, site, guides and participants with their certification. Back on shore: end time, depth, breathing apparatus and gas, as required by art. 12.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.4 6-5.4s6 2.1 6 5.4"/><path d="M16 5.2A3.2 3.2 0 0 1 16 11m1.6 3.9c2 .7 3.4 2.5 3.4 5.1"/></svg></div><h3>Customers, members, instructors and guides</h3><p>One record per person: contacts, emergency contact, certifications and medical certificates with their history, attached documents and photos.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 20h18.4z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6" fill="currentColor" stroke="none"/></svg></div><h3>Warnings</h3><p>The program tells you when a participant has no certification or when their medical certificate has expired.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="14" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="3.5" y="14" width="6.5" height="6.5" rx="1"/><path d="M14 14h2.5v2.5H14zM18 18h2.5v2.5H18zM14 19h1.5M19.5 14v2"/></svg></div><h3>Dive logs with a signed QR</h3><p>Every participant gets their own dive log, in Italian and in their language (6 languages), with a QR code signed by the dive centre's digital seal.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg></div><h3>Printouts</h3><p>Legal register, dive summaries, cancellation logs and registration form: preview, print or save as PDF and PNG.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg></div><h3>Encrypted archive and backups</h3><p>The archive is encrypted on the computer. Password-protected backups and an automatic copy to another folder.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Several people, one archive</h3><p>Every Windows account on the computer uses the same archive, one at a time.</p></div>
+<div class="card"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6v.4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg></div><h3>Manual and «?»</h3><p>A «?» next to every option explains what it is for and why it helps; the full Manual opens with F1.</p></div>
+</div>
+<div class="divekit"><img src="assets/divekit.png" alt="" width="72" height="72"><div><h2>Works with Nautilus DiveKit</h2><p>The diver scans the QR code on the dive log with the free <b>Nautilus DiveKit</b> app (Android and iPhone) and the dive goes into their logbook, with the data signed by the dive centre. Anyone can verify the QR code with the free web page: the LDI format is open and documented.</p><p>With DiveKit the diver can also send you, in a single PDF, their certifications, medical certificate, insurance and, if they wish, their personal details: attach it to their record in the Registro and you have everything at hand.</p><div class="link"><a href="https://sgambaroapps.github.io/nautilusdivekit/#en">Discover Nautilus DiveKit</a><a href="https://sgambaroapps.github.io/ldi/">Verify a dive log</a><a class="chip-ldi" href="https://github.com/sgambaroapps/ldi">The open LDI format</a></div></div></div>
+<div class="perche"><h2>Why it is different</h2><ul><li>Truly free: no subscription, no paid features</li><li>No ads and no account to create</li><li>Data stays only on the dive centre's computer: the program sends nothing to anyone</li><li>Open format: anyone can verify a dive log, with nothing to install</li><li>Digital signature: a dive log that has been altered is no longer valid</li><li>Works without internet</li></ul></div>
+<h2>What it looks like</h2>
+<div class="striscia">
+<img src="assets/shots/01-home.jpg" width="1400" height="788" loading="lazy" alt="Home">
+<img src="assets/shots/03-immersione.jpg" width="1400" height="788" loading="lazy" alt="A dive">
+<img src="assets/shots/04-partecipanti.jpg" width="1400" height="788" loading="lazy" alt="Participants">
+<img src="assets/shots/06-scheda-cliente.jpg" width="1400" height="788" loading="lazy" alt="A customer record">
+<img src="assets/shots/07-stampe.jpg" width="1400" height="788" loading="lazy" alt="Printouts">
+</div>
+<div class="chiusura"><h2>Download the program</h2><div class="store"><a href="https://apps.microsoft.com/detail/9PCM9BBVLB2Z?hl=en-GB&amp;gl=IT" class="ms"><img src="assets/badge/microsoft-en.svg" alt="Get it from Microsoft" onerror="this.parentElement.classList.add('senzabadge')"><span class="ripiego">Microsoft Store</span></a></div><p class="nota">Free for Windows. The program is in Italian; dive logs are printed in 6 languages.</p></div>
+<footer><div class="link"><a href="https://sgambaroapps.github.io/nautilus-privacy/registro.html">Privacy policy</a><a href="mailto:sgambaro.apps@gmail.com">Support</a><a href="https://sgambaroapps.github.io/nautilusdivekit/#en">Nautilus DiveKit</a><a href="https://sgambaroapps.github.io/ldi/">Verify dive logs</a></div><p>Independent project made in Italy. No dive centre data ever leaves the computer.</p><p class="disc">The program is provided free of charge "as is", without warranty of any kind. Whoever adopts it is responsible for its use, for the data entered and for complying with legal obligations. To the extent permitted by law, the author is not liable for any damage arising from the use of the program.</p></footer>
+</div></section>
+</main>
+<script>
+(function () {
+  var LINGUE = ["it", "en"];
+  document.body.classList.add("js");
+
+  function mostra(codice) {
+    if (LINGUE.indexOf(codice) === -1) { codice = "en"; }
+    LINGUE.forEach(function (c) {
+      document.getElementById(c).hidden = (c !== codice);
+    });
+    document.querySelectorAll("#lingue a").forEach(function (a) {
+      a.classList.toggle("attiva", a.dataset.lang === codice);
+    });
+    document.querySelectorAll("[data-claim]").forEach(function (s) {
+      s.hidden = (s.dataset.claim !== codice);
+    });
+    document.documentElement.lang = codice;
+    var t = document.getElementById(codice);
+    if (t && t.dataset.titolo) { document.title = t.dataset.titolo; }
+    window.dispatchEvent(new Event("resize")); // le frecce della lingua appena mostrata si aggiornano
+  }
+
+  document.querySelectorAll("#lingue a").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      mostra(a.dataset.lang);
+      try { history.replaceState(null, "", "#" + a.dataset.lang); } catch (err) {}
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  // Frecce ai lati delle schermate: avanti e indietro di una schermata (la barra sotto resta).
+  // Toccando una schermata si aprono tutte a schermo intero, partendo da quella.
+  var FRECCE = {
+    it: ["Schermata precedente", "Schermata successiva", "Chiudi", "Ingrandisci la schermata",
+         "Gira il telefono per vederla più grande"],
+    en: ["Previous screenshot", "Next screenshot", "Close", "Enlarge the screenshot",
+         "Turn your phone sideways to see it bigger"]
+  };
+  var PUNTA = { prima: "M15 5 8 12l7 7", dopo: "m9 5 7 7-7 7", chiudi: "M6 6l12 12M18 6 6 18" };
+  function pulsante(classe, testo, punta, dove, azione) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = classe;
+    b.setAttribute("aria-label", testo);
+    b.title = testo;
+    b.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="' + punta + '"/></svg>';
+    b.addEventListener("click", azione);
+    dove.appendChild(b);
+    return b;
+  }
+  // Frecce avanti/indietro di una striscia [s] dentro [dove]; [passo] dice di quanto scorrere.
+  function frecce(s, dove, testi, passo) {
+    var indietro = pulsante("freccia prima", testi[0], PUNTA.prima, dove, function () {
+      s.scrollBy({ left: -passo(), behavior: "smooth" });
+    });
+    var avanti = pulsante("freccia dopo", testi[1], PUNTA.dopo, dove, function () {
+      s.scrollBy({ left: passo(), behavior: "smooth" });
+    });
+    function aggiorna() {
+      indietro.disabled = s.scrollLeft <= 2;
+      avanti.disabled = s.scrollLeft + s.clientWidth >= s.scrollWidth - 2;
+    }
+    s.addEventListener("scroll", aggiorna, { passive: true });
+    window.addEventListener("resize", aggiorna);
+    window.addEventListener("load", aggiorna);
+    aggiorna();
+    return aggiorna;
+  }
+
+  var aperto = null; // lo schermo intero aperto in questo momento
+
+  function apri(s, n, testi) {
+    var foto = s.querySelectorAll("img");
+    var prima = document.activeElement;
+    var schermo = document.createElement("div");
+    schermo.className = "schermo";
+    schermo.setAttribute("role", "dialog");
+    schermo.setAttribute("aria-modal", "true");
+    var fila = document.createElement("div");
+    fila.className = "schermo-striscia";
+    foto.forEach(function (f) {
+      var riquadro = document.createElement("div");
+      var img = document.createElement("img");
+      img.src = f.currentSrc || f.src;
+      img.alt = f.alt;
+      riquadro.appendChild(img);
+      // un tocco sul fondo scuro (fuori dall'immagine) chiude
+      riquadro.addEventListener("click", function (e) { if (e.target === riquadro) { chiudi(); } });
+      fila.appendChild(riquadro);
+    });
+    schermo.appendChild(fila);
+    var conta = document.createElement("div");
+    conta.className = "conta";
+    schermo.appendChild(conta);
+    var gira = document.createElement("div");
+    gira.className = "gira";
+    gira.textContent = testi[4];
+    schermo.appendChild(gira);
+    var aggiornaFrecce = frecce(fila, schermo, testi, function () { return fila.clientWidth; });
+    var chiudiBtn = pulsante("chiudi", testi[2], PUNTA.chiudi, schermo, function () { chiudi(); });
+    function numero() {
+      var i = Math.round(fila.scrollLeft / Math.max(fila.clientWidth, 1));
+      conta.textContent = (i + 1) + " / " + foto.length;
+    }
+    fila.addEventListener("scroll", numero, { passive: true });
+
+    document.body.appendChild(schermo);
+    document.documentElement.style.overflow = "hidden";
+    fila.scrollLeft = n * fila.clientWidth;
+    numero();
+    aggiornaFrecce();
+    chiudiBtn.focus();
+
+    // sul telefono il tasto «indietro» chiude lo schermo intero invece di lasciare la pagina
+    try { history.pushState({ schermo: true }, ""); } catch (err) {}
+
+    aperto = {
+      schermo: schermo, fila: fila,
+      chiudi: function (daStoria) {
+        window.removeEventListener("resize", ricentra);
+        schermo.remove();
+        document.documentElement.style.overflow = "";
+        aperto = null;
+        if (prima && prima.focus) { prima.focus(); }
+        if (!daStoria && history.state && history.state.schermo) { history.back(); }
+      }
+    };
+    // girando il telefono la schermata resta quella
+    var attuale = n;
+    fila.addEventListener("scroll", function () {
+      attuale = Math.round(fila.scrollLeft / Math.max(fila.clientWidth, 1));
+    }, { passive: true });
+    function ricentra() { fila.scrollLeft = attuale * fila.clientWidth; }
+    window.addEventListener("resize", ricentra);
+  }
+  function chiudi() { if (aperto) { aperto.chiudi(false); } }
+
+  window.addEventListener("popstate", function () { if (aperto) { aperto.chiudi(true); } });
+  document.addEventListener("keydown", function (e) {
+    if (!aperto) { return; }
+    if (e.key === "Escape") { chiudi(); }
+    else if (e.key === "ArrowRight") { aperto.fila.scrollBy({ left: aperto.fila.clientWidth, behavior: "smooth" }); }
+    else if (e.key === "ArrowLeft") { aperto.fila.scrollBy({ left: -aperto.fila.clientWidth, behavior: "smooth" }); }
+    else if (e.key === "Tab") { // il fuoco resta dentro lo schermo intero
+      var tasti = [].filter.call(aperto.schermo.querySelectorAll("button"), function (b) { return !b.disabled; });
+      var i = tasti.indexOf(document.activeElement);
+      e.preventDefault();
+      tasti[(i + (e.shiftKey ? tasti.length - 1 : 1)) % tasti.length].focus();
+    }
+  });
+
+  document.querySelectorAll(".striscia").forEach(function (s) {
+    var box = document.createElement("div");
+    box.className = "carosello";
+    s.parentNode.insertBefore(box, s);
+    box.appendChild(s);
+    var testi = FRECCE[s.closest("[lang]").lang] || FRECCE.en;
+    frecce(s, box, testi, function () {
+      var img = s.querySelector("img");
+      return img ? img.getBoundingClientRect().width + 16 : s.clientWidth * 0.8;
+    });
+    s.querySelectorAll("img").forEach(function (img, n) {
+      img.setAttribute("tabindex", "0");
+      img.setAttribute("role", "button");
+      img.setAttribute("aria-label", testi[3] + (img.alt ? ": " + img.alt : ""));
+      img.addEventListener("click", function () { apri(s, n, testi); });
+      img.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); apri(s, n, testi); }
+      });
+    });
+  });
+
+  var daUrl = location.hash.replace("#", "");
+  var daBrowser = (navigator.language || "en").slice(0, 2).toLowerCase();
+  mostra(LINGUE.indexOf(daUrl) !== -1 ? daUrl : daBrowser);
+
+  // Con #it o #en nell'indirizzo si sceglie la lingua, non un punto della pagina: si torna in cima.
+  if (LINGUE.indexOf(daUrl) !== -1) {
+    var inCima = function () { window.scrollTo({ top: 0, behavior: "auto" }); };
+    inCima();
+    setTimeout(inCima, 0);
+    window.addEventListener("load", inCima);
+  }
+})();
+</script>
+</body></html>
